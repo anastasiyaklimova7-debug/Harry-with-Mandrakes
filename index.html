@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Present Simple vs Continuous - Magic Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Заменил шрифт на более читаемый и аккуратный Quicksand -->
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background: url("https://i.postimg.cc/tC85z5n7/Gemini-Generated-Image-ka45ofka45ofka45.jpg") center/cover no-repeat;
+  height: 100vh;
+  /* Применяем новый читаемый шрифт */
+  font-family: 'Quicksand', sans-serif;
+  overflow: hidden;
+}
+
+.question {
+  position: absolute;
+  top: 130px;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Немного изменил фон, чтобы соответствовать новой теме */
+  background: rgba(30, 0, 60, 0.7); /* Темно-фиолетовый полупрозрачный фон */
+  border: 5px solid #9C27B0; /* Магический фиолетовый цвет рамки */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  padding: 25px 60px;
+  /* Изменил цвет текста на светлый */
+  color: #F3E5F5;
+  font-size: 4vh;
+  font-weight: 700;
+  border-radius: 30px;
+  text-align: center;
+  z-index: 10;
+  width: 80%;
+  max-width: 900px; 
+  /* Более выраженная тень для текста */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.score {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(30, 0, 60, 0.8);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+  border: 4px solid #9C27B0;
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #F3E5F5;
+  z-index: 20;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.score span:first-child {
+  font-size: 3vh;
+  margin-bottom: 2px;
+}
+
+#scoreNumber {
+  font-size: 2vh;
+  font-weight: 900;
+  color: #F3E5F5;
+}
+
+.items-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  position: absolute;
+  bottom: -10vh; /* Опустили объекты еще ниже */
+  padding: 0 2%;
+  box-sizing: border-box;
+}
+
+.item-wrapper {
+  position: relative;
+  width: 30%;
+  height: 75vh; /* Сильно увеличили контейнер, чтобы текст над объектом помещался */
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  overflow: visible;
+}
+
+.front-item {
+  height: 52vh; /* Сделали передний объект еще больше */
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  z-index: 3;
+  position: absolute;
+  bottom: 0;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+  transition: transform 0.2s;
+}
+
+.front-item:hover {
+  transform: scale(1.05);
+}
+
+.back-item {
+  position: absolute;
+  bottom: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 45vh; /* Увеличили прячущийся объект */
+  width: auto;
+  max-width: 90%;
+  object-fit: contain;
+  z-index: 2;
+  transition: bottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.1s;
+}
+
+.back-item.show {
+  bottom: 20vh; /* Объект теперь выпрыгивает не так высоко (было 28vh) */
+}
+
+.back-text {
+  position: absolute;
+  bottom: 65vh; /* Опустили текст ниже, прямо над новым уровнем объекта (было 75vh) */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 3.5vh;
+  font-weight: 700;
+  color: #F3E5F5;
+  /* Более темный фон для текста */
+  background: rgba(74, 20, 140, 0.9);
+  padding: 8px 20px;
+  border: 2px solid #9C27B0;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  opacity: 0;
+  pointer-events: auto;
+  z-index: 4;
+  transition: opacity 0.4s ease, transform 0.2s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.back-text:hover {
+  transform: translateX(-50%) scale(1.1);
+  background: rgba(106, 27, 154, 1);
+}
+
+.sparkles {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #FFD700; /* Золотой */
+  border-radius: 50%;
+  pointer-events: none;
+  animation: sparkle 1s ease-out forwards;
+}
+
+@keyframes sparkle {
+  0% { transform: scale(1) translateY(0); opacity: 1; }
+  100% { transform: scale(0.3) translateY(-100px); opacity: 0; }
+}
+
+.magic-star {
+  position: absolute;
+  pointer-events: none;
+  animation: magicFloat 2.5s ease-in-out forwards;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+  z-index: 3500;
+}
+
+@keyframes magicFloat {
+  0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 1; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-300px) scale(1.5) rotate(180deg); opacity: 0; }
+}
+
+#tryAgain, #endScreen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(30, 0, 60, 0.95);
+  border-radius: 20px;
+  padding: 40px 60px;
+  font-size: 5vh;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  display: none;
+  z-index: 3000;
+  color: #F3E5F5;
+  text-shadow: 2px 2px 4px rgba(0,0,0,1);
+}
+
+#tryAgain {
+  border: 5px solid #D32F2F;
+  color: #FF5252;
+  cursor: pointer;
+}
+
+#endScreen {
+  border: 5px solid #9C27B0;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+#playAgainBtn {
+  background: #9C27B0;
+  color: #F3E5F5;
+  border: 2px solid #BA68C8;
+  padding: 15px 40px;
+  font-size: 3.5vh;
+  font-weight: bold;
+  border-radius: 15px;
+  cursor: pointer;
+  font-family: 'Quicksand', sans-serif; /* Поменяли шрифт на кнопке */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  transition: transform 0.2s, background 0.2s;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+#playAgainBtn:hover {
+  background: #7B1FA2;
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .question { font-size: 3vh; padding: 15px 20px; width: 90%; top: 100px; max-width: 95%; }
+  .score { width: 65px; height: 65px; top: 15px; right: 10px; border-width: 3px; }
+  .score span:first-child { font-size: 2vh; margin-bottom: 0px; }
+  #scoreNumber { font-size: 1.4vh; }
+  /* Увеличили размеры и на мобильных устройствах пропорционально */
+  .front-item { height: 42vh; } 
+  .back-item { height: 35vh; bottom: 8vh; }
+  .back-item.show { bottom: 16vh; } /* Меньше выпрыгивает на мобильных */
+  .back-text { bottom: 52vh; font-size: 2.8vh; } /* Текст тоже опустили */
+}
+</style>
+</head>
+<body>
+
+<div class="question" id="questionText"></div>
+<div class="score" id="scoreDisplay">
+  <span>✅</span>
+  <span id="scoreNumber">0 / 15</span>
+</div>
+
+<div class="items-container" id="itemsContainer">
+  <!-- Объект 1: Заменена ссылка на нужную -->
+  <div class="item-wrapper">
+    <img class="back-item" src="https://i.postimg.cc/tRZ2wJQ8/Chat-GPT-Image-28-avg-2026-g-19-38-25.png" alt="hidden object 1">
+    <div class="back-text"></div>
+    <img class="front-item" src="https://i.postimg.cc/fTVCXFyy/Chat-GPT-Image-28-avg-2026-g-19-39-39.png" alt="hiding place">
+  </div>
+  
+  <!-- Объект 2 -->
+  <div class="item-wrapper">
+    <img class="back-item" src="https://i.postimg.cc/tC85z5nT/Chat-GPT-Image-28-avg-2026-g-19-38-22.png" alt="hidden object 2">
+    <div class="back-text"></div>
+    <img class="front-item" src="https://i.postimg.cc/fTVCXFyy/Chat-GPT-Image-28-avg-2026-g-19-39-39.png" alt="hiding place">
+  </div>
+  
+  <!-- Объект 3 -->
+  <div class="item-wrapper">
+    <img class="back-item" src="https://i.postimg.cc/NfKDTVFR/Chat-GPT-Image-28-avg-2026-g-19-38-19.png" alt="hidden object 3">
+    <div class="back-text"></div>
+    <img class="front-item" src="https://i.postimg.cc/fTVCXFyy/Chat-GPT-Image-28-avg-2026-g-19-39-39.png" alt="hiding place">
+  </div>
+</div>
+
+<div id="tryAgain">💔 Too many mistakes!<br><span style="font-size: 0.6em">Click to try again</span></div>
+<div id="endScreen">
+  <div>✨ Pure Magic! ✨</div>
+  <button id="playAgainBtn">Play Again</button>
+</div>
+
+<!-- Аудио -->
+<audio id="popSound" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_7f5f996cb8.mp3?filename=pop-94319.mp3" preload="auto"></audio>
+<audio id="magicSound" preload="auto">
+  <source src="https://cdn.freesound.org/previews/320/320655_5260872-lq.mp3" type="audio/mpeg">
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7838cf0404.mp3?filename=magic-wand-6214.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// НОВЫЕ 15 ВОПРОСОВ ПО ТЕМЕ: Present Simple or Present Continuous (Только утвердительные)
+// Все варианты ответов теперь СТРОГО в формах Present Simple и Present Continuous
+const rawTasks = [
+  { text: "Look! The cat ... a mouse.", answers: ["is catching", "catches", "catch"], correct: 1 },
+  { text: "My brother usually ... breakfast at 8 o'clock.", answers: ["has", "is having", "have"], correct: 1 },
+  { text: "Listen! Someone ... the piano.", answers: ["is playing", "plays", "play"], correct: 1 },
+  { text: "They often ... to the cinema on Fridays.", answers: ["go", "are going", "goes"], correct: 1 },
+  { text: "Shhh! The baby ... right now.", answers: ["is sleeping", "sleeps", "sleep"], correct: 1 },
+  { text: "Water ... at 100 degrees Celsius.", answers: ["boils", "is boiling", "boil"], correct: 1 },
+  { text: "I ... a very interesting book at the moment.", answers: ["am reading", "read", "reads"], correct: 1 },
+  { text: "The sun ... in the east.", answers: ["rises", "is rising", "rise"], correct: 1 },
+  { text: "I am busy. I ... my homework.", answers: ["am doing", "do", "does"], correct: 1 },
+  { text: "She always ... her teeth before bed.", answers: ["brushes", "is brushing", "brush"], correct: 1 },
+  { text: "Look outside! It ... heavily.", answers: ["is raining", "rains", "rain"], correct: 1 },
+  { text: "Birds ... nests in spring.", answers: ["build", "are building", "builds"], correct: 1 },
+  { text: "We ... for our friends. They are late.", answers: ["are waiting", "wait", "waits"], correct: 1 },
+  { text: "My dad usually ... coffee in the morning.", answers: ["drinks", "is drinking", "drink"], correct: 1 },
+  { text: "He ... an email to his friend right now.", answers: ["is writing", "writes", "write"], correct: 1 }
+];
+
+let gameTasks = [];
+let currentTask = 0;
+let score = 0;
+let mistakes = 0;
+const maxMistakes = 5;
+const totalQuestions = rawTasks.length; // Всего 15 вопросов
+
+const itemWrappers = document.querySelectorAll('.item-wrapper');
+const questionText = document.getElementById('questionText');
+const tryAgain = document.getElementById('tryAgain');
+const endScreen = document.getElementById('endScreen');
+const scoreNumberDisplay = document.getElementById('scoreNumber');
+const popSound = document.getElementById('popSound');
+const magicSound = document.getElementById('magicSound');
+const itemsContainer = document.getElementById('itemsContainer');
+const playAgainBtn = document.getElementById('playAgainBtn');
+
+function shuffleArray(array) {
+  let curId = array.length;
+  while (0 !== curId) {
+    let randId = Math.floor(Math.random() * curId);
+    curId -= 1;
+    let tmp = array[curId];
+    array[curId] = array[randId];
+    array[randId] = tmp;
+  }
+  return array;
+}
+
+function initGame() {
+  gameTasks = rawTasks.map(t => ({
+    text: t.text,
+    answers: [...t.answers],
+    correctText: t.answers[t.correct - 1]
+  }));
+  shuffleArray(gameTasks);
+
+  currentTask = 0;
+  score = 0;
+  mistakes = 0;
+  scoreNumberDisplay.textContent = `0 / ${totalQuestions}`;
+
+  itemsContainer.style.display = "flex";
+  itemsContainer.style.pointerEvents = "auto";
+  questionText.style.display = "block";
+  document.querySelector('.score').style.display = "flex";
+  endScreen.style.display = "none";
+  tryAgain.style.display = "none";
+
+  loadTask();
+}
+
+function loadTask() {
+  const task = gameTasks[currentTask];
+  questionText.textContent = task.text;
+  
+  let shuffledAnswers = [...task.answers];
+  shuffleArray(shuffledAnswers);
+  
+  itemWrappers.forEach((wrapper, i) => {
+    const backItem = wrapper.querySelector('.back-item');
+    const text = wrapper.querySelector('.back-text');
+    
+    text.textContent = shuffledAnswers[i];
+    wrapper.dataset.isCorrect = (shuffledAnswers[i] === task.correctText) ? "true" : "false";
+    
+    backItem.classList.remove('show');
+    backItem.style.filter = "none";
+    text.style.opacity = 0;
+  });
+}
+
+function showBackItem(wrapper) {
+  const backItem = wrapper.querySelector('.back-item');
+  const text = wrapper.querySelector('.back-text');
+  backItem.classList.add('show');
+  text.style.opacity = 1;
+}
+
+function shake(element) {
+  element.style.transition = "transform 0.1s";
+  element.style.transform = "translateX(-50%) translateX(-15px)";
+  setTimeout(() => element.style.transform = "translateX(-50%) translateX(15px)", 100);
+  setTimeout(() => element.style.transform = "translateX(-50%) translateX(-15px)", 200);
+  setTimeout(() => element.style.transform = "translateX(-50%)", 300);
+}
+
+function makeSparkles(x, y) {
+  for (let i = 0; i < 15; i++) {
+    const s = document.createElement("div");
+    s.classList.add("sparkles");
+    s.style.left = x + Math.random() * 120 - 60 + "px";
+    s.style.top = y + Math.random() * 80 - 40 + "px";
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 1000);
+  }
+}
+
+function makeMagicStars(x, y) {
+  for (let i = 0; i < 5; i++) {
+    const star = document.createElement("div");
+    star.classList.add("magic-star");
+    
+    // Векторная звездочка (SVG)
+    star.innerHTML = `<svg viewBox="0 0 24 24" width="100%" height="100%" fill="#FFD700" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>`;
+    
+    star.style.left = x + Math.random() * 200 - 100 + "px";
+    star.style.top = y + Math.random() * 100 - 50 + "px";
+    
+    // Рандомизируем размер звезд от 20px до 60px
+    const size = 20 + Math.random() * 40;
+    star.style.width = size + "px";
+    star.style.height = size + "px";
+    
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 2500);
+  }
+}
+
+function showEndScreen() {
+  itemsContainer.style.display = "none";
+  questionText.style.display = "none";
+  document.querySelector('.score').style.display = "none";
+  endScreen.style.display = "flex";
+  
+  popSound.play().catch(e => console.log("Sound play error", e));
+  
+  let starCount = 0;
+  const starInterval = setInterval(() => {
+    // Звезды взлетают снизу экрана
+    makeMagicStars(Math.random() * window.innerWidth, window.innerHeight + 50);
+    starCount++;
+    if(starCount > 40) clearInterval(starInterval); // Увеличили количество волн со звездами
+  }, 150); // Ускорили появление звезд
+}
+
+itemWrappers.forEach(wrapper => {
+  const backItem = wrapper.querySelector('.back-item');
+  const text = wrapper.querySelector('.back-text');
+  const frontItem = wrapper.querySelector('.front-item');
+
+  frontItem.addEventListener('click', (e) => {
+    e.stopPropagation();
+    itemWrappers.forEach(w => {
+      w.querySelector('.back-item').classList.remove('show');
+      w.querySelector('.back-text').style.opacity = 0;
+    });
+    showBackItem(wrapper);
+  });
+
+  const handleAnswer = (e) => {
+    e.stopPropagation();
+    if (itemsContainer.style.pointerEvents === "none") return;
+    
+    if (!backItem.classList.contains('show')) {
+      itemWrappers.forEach(w => {
+        w.querySelector('.back-item').classList.remove('show');
+        w.querySelector('.back-text').style.opacity = 0;
+      });
+      showBackItem(wrapper);
+      return;
+    }
+
+    const isCorrect = wrapper.dataset.isCorrect === "true";
+    const rect = backItem.getBoundingClientRect();
+
+    if (isCorrect) {
+      // Прямое воспроизведение звука
+      magicSound.currentTime = 0;
+      const playPromise = magicSound.play();
+      if (playPromise !== undefined) {
+          playPromise.catch(error => {
+              console.log("Playback failed:", error);
+          });
+      }
+
+      backItem.style.filter = "drop-shadow(0 0 35px gold)";
+      makeSparkles(rect.left + rect.width/2, rect.top + rect.height/3);
+      score++;
+      scoreNumberDisplay.textContent = `${score} / ${totalQuestions}`;
+      itemsContainer.style.pointerEvents = "none";
+      
+      setTimeout(() => {
+        itemWrappers.forEach(w => {
+          w.querySelector('.back-item').classList.remove('show');
+          w.querySelector('.back-text').style.opacity = 0;
+        });
+        
+        setTimeout(() => {
+          currentTask++;
+          if (currentTask < gameTasks.length) {
+            loadTask();
+            itemsContainer.style.pointerEvents = "auto";
+          } else {
+            showEndScreen();
+          }
+        }, 600);
+      }, 1000);
+    } else {
+      shake(backItem);
+      mistakes++;
+      if (mistakes > maxMistakes) {
+        itemsContainer.style.display = "none";
+        questionText.style.display = "none";
+        document.querySelector('.score').style.display = "none";
+        tryAgain.style.display = "block";
+      }
+    }
+  };
+
+  text.addEventListener('click', handleAnswer);
+  backItem.addEventListener('click', handleAnswer);
+});
+
+tryAgain.addEventListener('click', () => initGame());
+playAgainBtn.addEventListener('click', () => initGame());
+
+initGame();
+</script>
+</body>
+</html>
